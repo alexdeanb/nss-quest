@@ -57,9 +57,10 @@ namespace Quest
 
         static void NewGame(Adventurer theAdvnenturer)
         {
+            Prize adventurerPrize = new Prize("An Unusually Light Chicken");
+            adventurerPrize.ShowPrize(theAdvnenturer);
             Console.WriteLine("Would you like to play again? (Y/N)");
             string response = Console.ReadLine();
-
             if (response == "Y" || response == "y")
             {
                 Game(theAdvnenturer);
