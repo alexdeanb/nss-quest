@@ -7,38 +7,26 @@ namespace Quest
 {
     class Program
     {
+
+        private static int gamesPlayed = 0;
         static void Main(string[] args)
         {
-            Adventurer ActiveAdventurer = CurrentAdventurer();
+            Adventurer ActiveAdventurer = CurrentAdventurer(50);
             Game(ActiveAdventurer);
         }
 
         static void Game(Adventurer theAdventurer)
         {
-            // "Awesomeness" is like our Adventurer's current "score"
-            // A higher Awesomeness is better
 
-            // Here we set some reasonable min and max values.
-            //  If an Adventurer has an Awesomeness greater than the max, they are truly awesome
-            //  If an Adventurer has an Awesomeness less than the min, they are terrible
             int minAwesomeness = 0;
             int maxAwesomeness = 100;
 
-
-
-            // A list of challenges for the Adventurer to complete
-            // Note we can use the List class here because have the line "using System.Collections.Generic;" at the top of the file.
-
             List<Challenge> challenges = ChallengeList();
-            // Loop through all the challenges and subject the Adventurer to them
             foreach (Challenge challenge in challenges)
             {
                 challenge.RunChallenge(theAdventurer);
             }
 
-
-            // This code examines how Awesome the Adventurer is after completing the challenges
-            // And praises or humiliates them accordingly
             if (theAdventurer.Awesomeness >= maxAwesomeness)
             {
                 Console.WriteLine("YOU DID IT! You are truly awesome!");
@@ -51,19 +39,24 @@ namespace Quest
             {
                 Console.WriteLine("I guess you did...ok? ...sorta. Still, you should get out of my sight.");
             }
-
+            Prize adventurerPrize = new Prize("An Unusually Light Chicken");
+            adventurerPrize.ShowPrize(theAdventurer);
             NewGame(theAdventurer);
         }
 
-        static void NewGame(Adventurer theAdvnenturer)
+        static void NewGame(Adventurer theAdventurer)
         {
-            Prize adventurerPrize = new Prize("An Unusually Light Chicken");
-            adventurerPrize.ShowPrize(theAdvnenturer);
+
+            Console.WriteLine(theAdventurer.Awesomeness);
             Console.WriteLine("Would you like to play again? (Y/N)");
             string response = Console.ReadLine();
             if (response == "Y" || response == "y")
             {
-                Game(theAdvnenturer);
+                gamesPlayed += 1;
+                Console.WriteLine(gamesPlayed);
+                theAdventurer.Awesomeness = gamesPlayed * 10 + 50;
+                Console.WriteLine(theAdventurer.Awesomeness);
+                Game(theAdventurer);
             }
             else
             {
@@ -74,11 +67,7 @@ namespace Quest
 
         static List<Challenge> ChallengeList()
         {
-            // Create a few challenges for our Adventurer's quest
-            // The "Challenge" Constructor takes three arguments
-            //   the text of the challenge
-            //   a correct answer
-            //   a number of awesome points to gain or lose depending on the success of the challenge
+            Challenge howOld = new Challenge("How old is the editor of this game?", 25, 25);
             Challenge twoPlusTwo = new Challenge("2 + 2?", 4, 10);
             Challenge theAnswer = new Challenge(
                 "What's the answer to life, the universe and everything?", 42, 25);
@@ -97,6 +86,42 @@ namespace Quest
 ",
                 4, 20
             );
+            Challenge favoriteColor = new Challenge(
+                @"What's my favorite color?
+    1) Goldenrod
+    2) Rebecca Purple
+    3) Yellow
+    4) Orange
+",
+                2, 20
+            );
+            Challenge favoriteGame = new Challenge(
+                @"What's my favorite game?
+    1) Legend of Zelda: Tears of the Kingdom
+    2) Fortnite
+    3) Minecraft
+    4) Counter-Strike: Global Offensive
+",
+                4, 20
+            );
+            Challenge ponder = new Challenge(
+                @"Why?
+    1) Because I said so.
+    2) What?
+    3) Yes.
+    4) Why not?
+",
+                1, 60
+            );
+            Challenge magicConch = new Challenge(
+                @"May I have something to eat?
+    1) No.
+    2) Try again.
+    3) ~No~
+    4) Of course!
+",
+                3, 15
+            );
 
 
             List<Challenge> challenges = new List<Challenge>()
@@ -105,17 +130,42 @@ namespace Quest
                 theAnswer,
                 whatSecond,
                 guessRandom,
-                favoriteBeatle
+                favoriteBeatle,
+                howOld,
+                favoriteColor,
+                favoriteGame,
+                ponder,
+                magicConch
             };
 
+            List<Challenge> UsedChallenges = new List<Challenge>();
+
+            List<int> indexes = new List<int>();
+
+            while (indexes.Count < 5)
+            {
+                Random r = new Random();
+                int genRand = r.Next(0, challenges.Count - 1);
+                if (!indexes.Contains(genRand))
+                {
+                    indexes.Add(genRand);
+                }
+            }
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                int index = indexes[i];
+                UsedChallenges.Add(challenges[index]);
+            }
 
 
-            return challenges;
+
+            return UsedChallenges;
 
 
         }
 
-        static Adventurer CurrentAdventurer()
+        static Adventurer CurrentAdventurer(int awesomeness)
         {
             // Make a new "Adventurer" object using the "Adventurer" class
             Console.WriteLine("What is the adventurer's name?");
@@ -126,7 +176,7 @@ namespace Quest
                 Colors = new List<string> { "Red", "Orange", "Yellow" },
                 Length = 55
             };
-            Adventurer theAdventurer = new Adventurer(name, adventurerRobe, adventurerHat);
+            Adventurer theAdventurer = new Adventurer(name, adventurerRobe, adventurerHat, awesomeness);
             Console.WriteLine(theAdventurer.GetDescription());
             return theAdventurer;
         }
